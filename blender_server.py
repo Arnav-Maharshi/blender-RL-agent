@@ -3,6 +3,8 @@ import bmesh
 import socket
 import json
 import struct
+from math import radians
+from mathutils import Vector
 
 def reset_scene():
     if bpy.context.object and bpy.context.object.mode != 'OBJECT':
@@ -64,7 +66,23 @@ def select(obj, face, edge, vert, mode: str = "face"):
         obj.edges[edge].select = True
     elif mode == "vert":
         obj.verts[vert].select = True
-    
+        
+def select_by_normal(bm, target_vector, angle_threshold=5):
+    target_vector = Vector(target_vector)
+    angle_threshold = radians(angle_threshold) # converting value from degrees -> radians
+    # Iterate through faces and select based on normal direction
+    for f in bm.faces:
+        # calculate the angle between the face normal and the target vector
+        angle = f.normal.angle(target_vector)
+
+        # check if the angle is within the defined threshold
+        if angle < angle_threshold:
+            f.select = True
+        
+        # we can also use dot product method
+        # if face.normal.dot(target_vector) > 0.9:
+        #     f.select = True
+
 def select_top_face(bm):   # ?? maybe we don't need an input argument??
     top_faces = [f for f in bm.faces if f.normal.z > 0.9]
     for f in top_faces:
@@ -96,31 +114,37 @@ def _get_obs():
     # Calculate Top Face Area
     top_face = max(bm.faces, key=lambda f: f.calc_center_median().z)
     top_area = top_face.calc_area()
+    
+    selected_faces = [f for f in bm.faces if f.select]
 
-    return [width, depth, height, top_area]
+    if len(selected_faces) > 0:
+        # If we have a selection, read its normal
+        active_face = selected_faces[0]
+        normal = list(active_face.normal)
+        # normal.x, normal.y, normal.z
+    else:
+        # if nothing is selected, the normal is zero
+        normal = [0.0, 0.0, 0.0]
+        
+        '''norm_x = [f.normal.x for f in bm.faces]
+        norm_y = [f.normal.y for f in bm.faces]
+        norm_z = [f.normal.z for f in bm.faces]'''
+
+    return [width, depth, height, top_area] + normal # for flattened list    #norm_x, norm_y, norm_z]
      
 def perform_action(action):
     bm, me = get_current_bmesh()
     #deselect_all()
     
-    is_face_selected = any(f.select for f in bm.faces) # Check if any face is currently selected
-    
-    reward = 0
     
     if action == 0: # SELECT TOP FACE
-        select_top_face(bm)
+        select_by_normal(bm, (0,0,1))
         
     elif action == 1: # SCALE
-        if is_face_selected:
-            Scale(0.8, 0.8, 1.0)
-        else:
-            reward -= 1.0 # Punish for trying to scale nothing
-            
+        Scale(0.8, 0.8, 1.0)
+        
     elif action == 2: # EXTRUDE
-        if is_face_selected:
-            Extrude(z=0.5)
-        else:
-            reward -= 1.0 # Punish for trying to extrude nothing
+        Extrude(z=0.5)
         
     update(me)
     bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP', iterations=1) # Update Viewport

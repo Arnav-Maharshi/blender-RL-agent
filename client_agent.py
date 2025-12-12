@@ -19,11 +19,13 @@ class RemoteBlenderEnv(gym.Env):
         self.observation_space = spaces.Box(
             low=-np.inf, 
             high=np.inf, 
-            shape=(4,), # x,y,z coordinates
+            shape=(7,), # width, depth, height, top_area, normal.x, normal.y, normal.z (of active face)
             dtype=np.float32
         )
 
         self.target_height = 4.0
+        self.target_face = [0,0,1] # Face with normal vector pointing up (top face)
+
         self.max_steps = 20
         self.current_step = 0
 
@@ -42,12 +44,21 @@ class RemoteBlenderEnv(gym.Env):
 
         observation = self._send_command("STEP", action) # ask blender to move/execute action and return new observation
         curr_height = observation[2]
-        
+        curr_normal = observation[4:7]
+        reward = 0.0
+
+        alignment = np.dot(np.array(curr_normal), np.array(self.target_face))
+
+        if alignment > 0.9:
+            reward += 1
+        else:
+            reward -= 1
+
         distance = abs(self.target_height - curr_height)
         reward = -distance
         
         terminated = False
-        if distance < 0.2:
+        if distance < 0.2 and alignment > 0.9:
             reward += 100 # BIG BONUS
             terminated = True
             print(f"SUCCESS! Reached Height {curr_height:.2f}")
