@@ -166,8 +166,10 @@ def perform_action(action):
         
     elif action == 7: # EXTRUDE
         if is_face_selected:
-            Extrude(z=0.5)
-        
+            #Extrude(z=0.5)
+            bpy.ops.transform.shrink_fatten(value=0.5) # extrude along normals by 0.5 units
+
+            
         
     update(me)
     bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP', iterations=1) # Update Viewport
