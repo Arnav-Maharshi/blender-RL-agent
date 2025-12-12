@@ -69,9 +69,17 @@ def select(obj, face, edge, vert, mode: str = "face"):
         
 def select_by_normal(bm, target_vector, angle_threshold=5):
     target_vector = Vector(target_vector)
+    if target_vector.length < 0.001:
+        print("Target vector is zero vector! ABORTING!")
+        return
+    
     angle_threshold = radians(angle_threshold) # converting value from degrees -> radians
+    
     # Iterate through faces and select based on normal direction
     for f in bm.faces:
+        if f.normal.length < 0.001: # skipping current iteration if the face has a zero normal vector
+            continue                # (probably squashed the solid/invalid face)
+        
         # calculate the angle between the face normal and the target vector
         angle = f.normal.angle(target_vector)
 
