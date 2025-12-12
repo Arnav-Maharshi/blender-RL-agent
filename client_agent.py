@@ -14,7 +14,7 @@ class RemoteBlenderEnv(gym.Env):
         self.sock.connect(('localhost', 9999))
        
        # Environment setup
-        self.action_space = spaces.Discrete(3) 
+        self.action_space = spaces.Discrete(8)
         
         self.observation_space = spaces.Box(
             low=-np.inf, 

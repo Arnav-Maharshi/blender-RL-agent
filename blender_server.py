@@ -136,15 +136,30 @@ def perform_action(action):
     bm, me = get_current_bmesh()
     #deselect_all()
     
+    directions = [
+    (-1,0,0), # left
+    (1,0,0), # right
+    (0,1,0), # front
+    (0,-1,0), # back
+    (0,0,1), # top
+    (0,0,-1) # bottom
+    ]
     
-    if action == 0: # SELECT TOP FACE
-        select_by_normal(bm, (0,0,1))
+    is_face_selected = any(f.select for f in bm.faces)
+    
+    if action < 6: # SELECT FACE
+        target_vector = directions[action]
+        deselect_all()
+        select_by_normal(bm, target_vector)
         
-    elif action == 1: # SCALE
-        Scale(0.8, 0.8, 1.0)
+    elif action == 6: # SCALE
+        if is_face_selected:
+            Scale(0.8, 0.8, 0.8)
         
-    elif action == 2: # EXTRUDE
-        Extrude(z=0.5)
+    elif action == 7: # EXTRUDE
+        if is_face_selected:
+            Extrude(z=0.5)
+        
         
     update(me)
     bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP', iterations=1) # Update Viewport
