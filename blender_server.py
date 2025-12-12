@@ -5,9 +5,8 @@ import json
 import struct
 
 def reset_scene():
-    # Ensure in Object Mode before deleting (otherwise deletion can fail)
-    bpy.ops.object.mode_set(mode='OBJECT')
-
+    if bpy.context.object and bpy.context.object.mode != 'OBJECT':
+        bpy.ops.object.mode_set(mode='OBJECT')
     # Select and delete everything
     bpy.ops.object.select_all(action='SELECT')
     bpy.ops.object.delete()
@@ -102,7 +101,7 @@ def _get_obs():
      
 def perform_action(action):
     bm, me = get_current_bmesh()
-    deselect_all()
+    #deselect_all()
     
     is_face_selected = any(f.select for f in bm.faces) # Check if any face is currently selected
     
@@ -137,6 +136,7 @@ def run_server():
     print("Blender Server Ready. Waiting for Client (the brain)...")
     client, addr = server.accept() # will wait till another program connects
     print(f"Connected: {addr}")
+    reset_scene()
     
     try:
         while True:
