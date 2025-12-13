@@ -85,10 +85,15 @@ class RemoteBlenderEnv(gym.Env):
 # --- TRAINING ---
 if __name__ == "__main__":
     env = RemoteBlenderEnv()
+    log_dir = "tensorboard_logs/" # Create a folder for logs
     
     print("Training...")
-    model = PPO("MlpPolicy", env, verbose=1)
-    model.learn(total_timesteps=1000)
+    model = PPO("MlpPolicy", 
+                env, 
+                verbose=1,
+                tensorboard_log=log_dir,
+                )
+    model.learn(total_timesteps=1000, tb_log_name="Run_1")
     
     print("Done! Saving...")
     model.save("my_remote_agent")  
