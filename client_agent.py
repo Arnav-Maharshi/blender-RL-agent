@@ -92,6 +92,7 @@ if __name__ == "__main__":
                 env, 
                 verbose=1,
                 tensorboard_log=log_dir,
+                n_steps=512
                 )
     model.learn(total_timesteps=1000, tb_log_name="Run_1")
     
