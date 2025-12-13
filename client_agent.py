@@ -50,24 +50,27 @@ class RemoteBlenderEnv(gym.Env):
         alignment = np.dot(np.array(curr_normal), np.array(self.target_face))
 
         if alignment > 0.9:
-            reward += 1
+            reward += 2.0
         else:
-            reward -= 1
+            reward -= 1.0
 
         distance = abs(self.target_height - curr_height)
-        reward = -distance
+        reward -= (distance*0.1)
         
         terminated = False
         if distance < 0.2 and alignment > 0.9:
             reward += 100 # BIG BONUS
             terminated = True
             print(f"SUCCESS! Reached Height {curr_height:.2f}")
-        else:
-            reward = -distance
-            terminated = False
+        '''else:
+            reward -= distance
+            terminated = False'''
             
         truncated = (self.current_step >= self.max_steps)
         
+        if self.current_step < 5:
+            print(f"DEBUG: Action={action}, Normal={curr_normal}, Reward={reward}")
+
         return observation, reward, terminated, truncated, {}
    
 
