@@ -68,8 +68,8 @@ class RemoteBlenderEnv(gym.Env):
             
         truncated = (self.current_step >= self.max_steps)
         
-        if self.current_step < 5:
-            print(f"DEBUG: Action={action}, Normal={curr_normal}, Reward={reward}")
+        '''if self.current_step < 5:
+            print(f"DEBUG: Action={action}, Normal={curr_normal}, Reward={reward}")'''
 
         return observation, reward, terminated, truncated, {}
    
@@ -94,7 +94,7 @@ if __name__ == "__main__":
                 tensorboard_log=log_dir,
                 n_steps=512
                 )
-    model.learn(total_timesteps=1000, tb_log_name="Run_1")
+    model.learn(total_timesteps=10000, tb_log_name="Run_2_LONG10K")
     
     print("Done! Saving...")
     model.save("my_remote_agent")  
