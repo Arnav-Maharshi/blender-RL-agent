@@ -4,6 +4,7 @@ import numpy as np
 import socket
 import json
 from stable_baselines3 import PPO
+import random
 
 class RemoteBlenderEnv(gym.Env):
     def __init__(self):
@@ -19,11 +20,11 @@ class RemoteBlenderEnv(gym.Env):
         self.observation_space = spaces.Box(
             low=-np.inf, 
             high=np.inf, 
-            shape=(7,), # width, depth, height, top_area, normal.x, normal.y, normal.z (of active face)
+            shape=(8,), # width, depth, height, top_area, normal.x, normal.y, normal.z (of active face), target_height
             dtype=np.float32
         )
 
-        self.target_height = 4.0
+        self.target_height = random.uniform(2.0, 10.0)
         self.target_face = [0,0,1] # Face with normal vector pointing up (top face)
 
         self.max_steps = 20
@@ -43,6 +44,8 @@ class RemoteBlenderEnv(gym.Env):
         
 
         observation = self._send_command("STEP", action) # ask blender to move/execute action and return new observation
+        
+        observation = np.append(observation, self.target_height) # "reminding" the agent what it's target is
         curr_height = observation[2]
         curr_normal = observation[4:7]
         reward = 0.0
@@ -77,9 +80,12 @@ class RemoteBlenderEnv(gym.Env):
     def reset(self, seed=None, options=None):
         super().reset(seed=seed)
         self.current_step = 0
-        
+        self.target_height = random.uniform(2.0, 10.0)
+
         # Ask Blender to reset and give us the starting numbers
         obs = self._send_command("RESET")
+        obs = np.append(obs, self.target_height) # setting up the new target after each episode
+
         return obs, {}
         
 # --- TRAINING ---
@@ -92,9 +98,10 @@ if __name__ == "__main__":
                 env, 
                 verbose=1,
                 tensorboard_log=log_dir,
-                n_steps=512
+                n_steps=512,
+                device="auto",
                 )
-    model.learn(total_timesteps=10000, tb_log_name="Run_2_LONG10K")
+    model.learn(total_timesteps=20000, tb_log_name="Run_3_GENERALIZATION")
     
     print("Done! Saving...")
     model.save("my_remote_agent")  
