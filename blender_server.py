@@ -162,7 +162,7 @@ def perform_action(action):
         
     elif action == 6: # SCALE
         if is_face_selected:
-            Scale(0.8, 0.8, 0.8)
+            Scale(0.5, 0.5, 0.5)
         
     elif action == 7: # EXTRUDE
         if is_face_selected:

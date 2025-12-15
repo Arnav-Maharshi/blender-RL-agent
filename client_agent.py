@@ -47,6 +47,7 @@ class RemoteBlenderEnv(gym.Env):
         
         observation = np.append(observation, self.target_height) # "reminding" the agent what it's target is
         curr_height = observation[2]
+        curr_top_area = observation[3]
         curr_normal = observation[4:7]
         reward = 0.0
 
@@ -61,13 +62,11 @@ class RemoteBlenderEnv(gym.Env):
         reward -= (distance*0.1)
         
         terminated = False
-        if distance < 0.2 and alignment > 0.9:
-            reward += 100 # BIG BONUS
+        if distance < 0.2 and alignment > 0.9 and curr_top_area < 0.1:
+            reward += 200 # BIG BONUS
             terminated = True
-            print(f"SUCCESS! Reached Height {curr_height:.2f}")
-        '''else:
-            reward -= distance
-            terminated = False'''
+            print("SUCCESS! Target Height {self.target_height:.2f} \n\r\r\r\r\r\r\r\r Reached Height {curr_height:.2f}")
+        reward += (4 - curr_top_area)*2 # reward for smaller top area
             
         truncated = (self.current_step >= self.max_steps)
         
@@ -101,7 +100,7 @@ if __name__ == "__main__":
                 n_steps=512,
                 device="auto",
                 )
-    model.learn(total_timesteps=20000, tb_log_name="Run_3_GENERALIZATION")
+    model.learn(total_timesteps=20000, tb_log_name="Run_4_PYRAMID")
     
     print("Done! Saving...")
     model.save("my_remote_agent")  
