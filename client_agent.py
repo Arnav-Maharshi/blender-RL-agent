@@ -66,7 +66,7 @@ class RemoteBlenderEnv(gym.Env):
             reward += 200 # BIG BONUS
             terminated = True
             print("SUCCESS! Target Height {self.target_height:.2f} \n\r\r\r\r\r\r\r\r Reached Height {curr_height:.2f}")
-        reward += (4 - curr_top_area)*2 # reward for smaller top area
+        reward -= (curr_top_area*0.5) # punishment for bigger top area
             
         truncated = (self.current_step >= self.max_steps)
         
@@ -100,7 +100,7 @@ if __name__ == "__main__":
                 n_steps=512,
                 device="auto",
                 )
-    model.learn(total_timesteps=20000, tb_log_name="Run_4_PYRAMID")
+    model.learn(total_timesteps=20000, tb_log_name="Run_5_PYRAMIDv2")
     
     print("Done! Saving...")
     model.save("my_remote_agent")  
