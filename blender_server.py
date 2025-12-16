@@ -160,15 +160,18 @@ def perform_action(action):
         deselect_all()
         select_by_normal(bm, target_vector)
         
-    elif action == 6: # SCALE
+    elif action == 6: # SCALE DOWN
         if is_face_selected:
             Scale(0.5, 0.5, 0.5)
+            
+    elif action == 7: # SCALE UP
+        if is_face_selected:
+            Scale(1.5,1.5,1.5)
         
-    elif action == 7: # EXTRUDE
+    elif action == 8: # EXTRUDE
         if is_face_selected:
             #Extrude(z=0.5)
-            bpy.ops.transform.shrink_fatten(value=0.5) # extrude along normals by 0.5 units
-
+            bpy.ops.transform.shrink_fatten(value=0.5)
             
         
     update(me)
