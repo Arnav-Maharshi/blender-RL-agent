@@ -12,6 +12,11 @@ def reset_scene():
     # Select and delete everything
     bpy.ops.object.select_all(action='SELECT')
     bpy.ops.object.delete()
+    
+    # Delete all unused meshesfrom memory to speed up trainihg
+    for block in bpy.data.meshes:
+        if block.users == 0:
+            bpy.data.meshes.remove(block)
     add_cube()
     bpy.ops.object.mode_set(mode='EDIT')
     
@@ -175,7 +180,7 @@ def perform_action(action):
             
         
     update(me)
-    bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP', iterations=1) # Update Viewport
+    #bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP', iterations=1) # Update Viewport
     
 
 # *SERVER LOOP*
