@@ -59,7 +59,7 @@ class RemoteBlenderEnv(gym.Env):
             reward -= 1.0
 
         distance = abs(self.target_height - curr_height)
-        reward -= (distance*0.1)
+        reward -= (distance*0.5)
         
         terminated = False
         if distance < 0.2 and alignment > 0.9 and curr_top_area < 0.1:
