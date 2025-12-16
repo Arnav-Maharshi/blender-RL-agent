@@ -59,14 +59,14 @@ class RemoteBlenderEnv(gym.Env):
             reward -= 1.0
 
         distance = abs(self.target_height - curr_height)
-        reward -= (distance*0.5)
+        reward -= min((distance*0.2), 1.5)
         
         terminated = False
         if distance < 0.2 and alignment > 0.9 and curr_top_area < 0.1:
             reward += 200 # BIG BONUS
             terminated = True
             print(f"SUCCESS! Target Height {self.target_height:.2f} \n\r\r\r\r\r\r\r\r Reached Height {curr_height:.2f}")
-        reward -= (curr_top_area*0.5) # punishment for bigger top area
+        reward -= min((curr_top_area*0.1), 1.5) # punishment for bigger top area
             
         truncated = (self.current_step >= self.max_steps)
         
@@ -91,7 +91,7 @@ class RemoteBlenderEnv(gym.Env):
 if __name__ == "__main__":
     env = RemoteBlenderEnv()
     log_dir = "tensorboard_logs/" # Create a folder for logs
-    run_name = "Run_7_PYRAMIDv2"
+    run_name = "Run_8_PYRAMIDv2"
 
     print("Training...")
     model = PPO("MlpPolicy", 
@@ -99,7 +99,7 @@ if __name__ == "__main__":
                 verbose=1,
                 tensorboard_log=log_dir,
                 n_steps=512,
-                ent_coef=0.07,
+                ent_coef=0.01,
                 device="auto",
                 )
     model.learn(total_timesteps=50000, tb_log_name=f"{run_name}")
