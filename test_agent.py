@@ -7,6 +7,9 @@ from stable_baselines3 import PPO
 import random
 import time
 
+model_path = f"models/Run_9_HOURGLASS.zip"
+#model_path = "./my_remote_agent.zip"
+
 class RemoteBlenderEnv(gym.Env):
     def __init__(self):
         super(RemoteBlenderEnv, self).__init__()
@@ -16,7 +19,7 @@ class RemoteBlenderEnv(gym.Env):
         self.sock.connect(('localhost', 9999))
        
        # Environment setup
-        self.action_space = spaces.Discrete(8)
+        self.action_space = spaces.Discrete(9)
         
         self.observation_space = spaces.Box(
             low=-np.inf, 
@@ -91,8 +94,6 @@ if __name__ == "__main__":
     print("Testing...")
     env = RemoteBlenderEnv()
     env.reset()
-    #models_path = f"models/Run_5_PYRAMIDv2.zip"
-    model_path = "./my_remote_agent.zip"
     model = PPO.load(model_path, env=env)
 
     episodes = 10
