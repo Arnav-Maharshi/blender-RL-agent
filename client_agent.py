@@ -91,7 +91,7 @@ class RemoteBlenderEnv(gym.Env):
 if __name__ == "__main__":
     env = RemoteBlenderEnv()
     log_dir = "tensorboard_logs/" # Create a folder for logs
-    run_name = "Run_6_PYRAMIDv2"
+    run_name = "Run_7_PYRAMIDv2"
 
     print("Training...")
     model = PPO("MlpPolicy", 
@@ -99,10 +99,10 @@ if __name__ == "__main__":
                 verbose=1,
                 tensorboard_log=log_dir,
                 n_steps=512,
-                ent_coef=0.01,
+                ent_coef=0.07,
                 device="auto",
                 )
-    model.learn(total_timesteps=20000, tb_log_name=f"{run_name}_2")
+    model.learn(total_timesteps=50000, tb_log_name=f"{run_name}")
     
     print("Done! Saving...")
-    model.save(f"models/{run_name}_2")  
+    model.save(f"models/{run_name}")  
