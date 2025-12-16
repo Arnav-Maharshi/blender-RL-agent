@@ -49,7 +49,7 @@ class RemoteBlenderEnv(gym.Env):
         curr_height = observation[2]
         curr_top_area = observation[3]
         curr_normal = observation[4:7]
-        reward = 0.0
+        reward = 0.0 # ensuring reward/punishment does not accumulate over steps
 
         alignment = np.dot(np.array(curr_normal), np.array(self.target_face))
 
@@ -65,7 +65,7 @@ class RemoteBlenderEnv(gym.Env):
         if distance < 0.2 and alignment > 0.9 and curr_top_area < 0.1:
             reward += 200 # BIG BONUS
             terminated = True
-            print("SUCCESS! Target Height {self.target_height:.2f} \n\r\r\r\r\r\r\r\r Reached Height {curr_height:.2f}")
+            print(f"SUCCESS! Target Height {self.target_height:.2f} \n\r\r\r\r\r\r\r\r Reached Height {curr_height:.2f}")
         reward -= (curr_top_area*0.5) # punishment for bigger top area
             
         truncated = (self.current_step >= self.max_steps)
@@ -91,7 +91,8 @@ class RemoteBlenderEnv(gym.Env):
 if __name__ == "__main__":
     env = RemoteBlenderEnv()
     log_dir = "tensorboard_logs/" # Create a folder for logs
-    
+    run_name = "Run_6_PYRAMIDv2"
+
     print("Training...")
     model = PPO("MlpPolicy", 
                 env, 
@@ -100,7 +101,7 @@ if __name__ == "__main__":
                 n_steps=512,
                 device="auto",
                 )
-    model.learn(total_timesteps=20000, tb_log_name="Run_5_PYRAMIDv2")
+    model.learn(total_timesteps=20000, tb_log_name=f"{run_name}")
     
     print("Done! Saving...")
-    model.save("my_remote_agent")  
+    model.save(f"models/{run_name}")  
