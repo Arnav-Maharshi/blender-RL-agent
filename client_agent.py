@@ -99,9 +99,10 @@ if __name__ == "__main__":
                 verbose=1,
                 tensorboard_log=log_dir,
                 n_steps=512,
+                ent_coef=0.01,
                 device="auto",
                 )
-    model.learn(total_timesteps=20000, tb_log_name=f"{run_name}")
+    model.learn(total_timesteps=20000, tb_log_name=f"{run_name}_2")
     
     print("Done! Saving...")
-    model.save(f"models/{run_name}")  
+    model.save(f"models/{run_name}_2")  
