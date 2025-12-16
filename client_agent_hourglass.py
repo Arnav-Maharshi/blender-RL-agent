@@ -59,7 +59,7 @@ class RemoteBlenderEnv(gym.Env):
             reward -= 1.0
 
                 
-        dynamic_top_area = (6.0 - curr_height)**2
+        dynamic_top_area = 0.1 * (7.0 - curr_height)**2
 
         distance = abs(self.target_height - curr_height)
         reward -= min((distance*0.2), 1.5)
@@ -97,15 +97,16 @@ if __name__ == "__main__":
     run_name = "Run_9_HOURGLASS"
 
     print("Training...")
-    model = PPO("MlpPolicy", 
+    ''' model = PPO("MlpPolicy", 
                 env, 
                 verbose=1,
                 tensorboard_log=log_dir,
                 n_steps=512,
                 ent_coef=0.01,
                 device="cpu",
-                )
-    model.learn(total_timesteps=20000, tb_log_name=f"{run_name}")
+                ) ''' 
+    model = PPO.load("models/Run_9_HOURGLASS_3", env=env)
+    model.learn(total_timesteps=50000, reset_num_timesteps=False, tb_log_name=f"{run_name}")
     
     print("Done! Saving...")
-    model.save(f"models/{run_name}_2")  
+    model.save(f"models/{run_name}_3(50k)")  
