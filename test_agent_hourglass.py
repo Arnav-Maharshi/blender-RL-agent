@@ -5,6 +5,11 @@ import socket
 import json
 from stable_baselines3 import PPO
 import random
+import time
+
+model_path = f"models/Run_10_HOURGLASS_1(100k).zip"
+#model_path = "./my_remote_agent.zip"
+episodes = 10000
 
 class RemoteBlenderEnv(gym.Env):
     def __init__(self):
@@ -90,23 +95,25 @@ class RemoteBlenderEnv(gym.Env):
 
         return obs, {}
         
-# --- TRAINING ---
+# --- TESTING ---
 if __name__ == "__main__":
+    print("Testing...")
     env = RemoteBlenderEnv()
-    log_dir = "tensorboard_logs/" # Create a folder for logs
-    run_name = "Run_10_HOURGLASS"
-
-    print("Training...")
-    '''model = PPO("MlpPolicy", 
-                env, 
-                verbose=1,
-                tensorboard_log=log_dir,
-                n_steps=512,
-                ent_coef=0.01,
-                device="cpu",
-                )  '''
-    model = PPO.load("models/Run_10_HOURGLASS_1.zip", env=env, device="cpu")
-    model.learn(total_timesteps=50000, tb_log_name=f"{run_name}", reset_num_timesteps=False)
+    env.reset()
+    model = PPO.load(model_path, env=env, device="cuda")
     
-    print("Done! Saving...")
-    model.save(f"models/{run_name}_1(100k)")  
+    for ep in range(9950,episodes):
+        obs, _ = env.reset()
+
+        # Printing target height and episode count
+        target_h = obs[7] 
+        print(f"\n--- EPISODE {ep+1} Start. TARGET HEIGHT: {target_h:.2f}m ---")
+
+        done = False
+        while not done:
+            action, _states = model.predict(obs)
+            obs, reward, terminated, truncated, info = env.step(action)
+            time.sleep(0.1)  # Slow down for observation
+            done = terminated or truncated
+        print(f"EPISODE FINISHED. \n Reward: {reward:.2f}\n\n")
+        time.sleep(1)  # Pause between episodes
