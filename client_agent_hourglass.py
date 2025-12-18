@@ -62,14 +62,18 @@ class RemoteBlenderEnv(gym.Env):
         dynamic_top_area = 0.1 * (midpoint - curr_height)**2
 
         distance = abs(self.target_height - curr_height)
-        reward -= min((distance*0.2), 1.5)
+        reward -= min((distance*0.2), 2.5)
+
+        if  abs(curr_top_area - dynamic_top_area) < 0.2:
+            reward += 3.0
+        else:
+            reward -= min(abs(curr_top_area - dynamic_top_area)*0.2, 1.5)
         
         terminated = False
-        if distance < 0.2 and alignment > 0.9 and abs(curr_top_area - dynamic_top_area) < 0.2:
+        if distance < 0.2 and alignment > 0.9:
             reward += 200 # BIG BONUS
             terminated = True
             print(f"SUCCESS! Target Height {self.target_height:.2f} \n\r\r\r\r\r\r\r\r Reached Height {curr_height:.2f}")
-        reward -= abs(curr_top_area - dynamic_top_area)*0.2
         
         truncated = (self.current_step >= self.max_steps)
         
@@ -94,19 +98,19 @@ class RemoteBlenderEnv(gym.Env):
 if __name__ == "__main__":
     env = RemoteBlenderEnv()
     log_dir = "tensorboard_logs/" # Create a folder for logs
-    run_name = "Run_10_HOURGLASS"
+    run_name = "Run_11_HOURGLASS"
 
     print("Training...")
-    '''model = PPO("MlpPolicy", 
+    model = PPO("MlpPolicy", 
                 env, 
                 verbose=1,
                 tensorboard_log=log_dir,
                 n_steps=512,
                 ent_coef=0.01,
                 device="cpu",
-                )  '''
-    model = PPO.load("models/Run_10_HOURGLASS_1.zip", env=env, device="cpu")
-    model.learn(total_timesteps=50000, tb_log_name=f"{run_name}", reset_num_timesteps=False)
+                )
+    #model = PPO.load("models/Run_10_HOURGLASS_1.zip", env=env, device="cpu")
+    model.learn(total_timesteps=100000, tb_log_name=f"{run_name}", reset_num_timesteps=False)
     
     print("Done! Saving...")
     model.save(f"models/{run_name}_1(100k)")  
