@@ -61,10 +61,13 @@ class RemoteBlenderEnv(gym.Env):
         midpoint = self.target_height / 2.0
         dynamic_top_area = 0.1 * (midpoint - curr_height)**2
         dynamic_top_area_target = abs(curr_top_area - dynamic_top_area)
+        distance_to_midpoint = abs(midpoint - curr_height)
+
+
         distance = abs(self.target_height - curr_height)
         reward -= min((distance*0.2), 2.5) # penalty for height difference
 
-        if  dynamic_top_area_target < 0.2: # checkpoint for top area matching
+        if  dynamic_top_area_target < 0.2 and distance_to_midpoint < 0.2: # checkpoint for top area matching at midpoint of target height
             reward += 3.0
         else:
             reward -= min(dynamic_top_area_target*0.2, 1.5)
@@ -113,4 +116,4 @@ if __name__ == "__main__":
     model.learn(total_timesteps=100000, tb_log_name=f"{run_name}")#, reset_num_timesteps=)
     
     print("Done! Saving...")
-    model.save(f"models/{run_name}_3(100k)")  
+    model.save(f"models/{run_name}_4(100k)")  
