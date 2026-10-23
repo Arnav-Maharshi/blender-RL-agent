@@ -100,7 +100,7 @@ if __name__ == "__main__":
                 tensorboard_log=log_dir,
                 n_steps=512,
                 ent_coef=0.01,
-                device="auto",
+                device="cpu",
                 )
     model.learn(total_timesteps=50000, tb_log_name=f"{run_name}")
     
