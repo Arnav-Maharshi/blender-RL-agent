@@ -1,7 +1,7 @@
 # Blender RL Agent: Procedural 3D Mesh Generation
 
 <p align="center">
-  <video src="Project documentation\#5_demo learning to create hourglass (Run_10_1).mp4" width="1000" alt="Blender Agent in Action"></video >
+  <video src="./Project documentation/#5_demo learning to create hourglass (Run_10_1).mp4" width="100%" alt="Blender Agent in Action"></video >
 </p>
 
 ## Overview
